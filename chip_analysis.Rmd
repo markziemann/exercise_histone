@@ -56,6 +56,8 @@ head(k9a) |>
   kbl(caption = "H3K9ac TSS data") |>
   kable_paper("hover", full_width = F)
 
+colSums(k9a)
+
 k36 <- read.table("raw_data/h3k36ac/h3k36_counts.tsv",header=TRUE)
 dim(k36)
 
@@ -68,6 +70,8 @@ colnames(k36a) <- c("pos1","pre1","pos2","pre2","pos3","pre3","pos4","pre4","pos
 head(k36a) |>
   kbl(caption = "H3K36ac TSS data") |>
   kable_paper("hover", full_width = F)
+
+colSums(k36a)
 
 rpm9 <- apply(k9a, 2 , function(x) { x / sum(x) } ) * 1000000
 rpm9 <- rpm9[rowMeans(rpm9) > 1,]
@@ -88,12 +92,22 @@ XMAX=max(mds9[,1])*1.1
 plot(mds9, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main="H3K9ac",xlim=c(XMIN,XMAX),bty="n")
 text(mds9, labels=colnames(k9a) ,cex=1.1)
 
+pdf("k9a_mds.pdf",width=5,height=5)
+plot(mds9, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main="H3K9ac",xlim=c(XMIN,XMAX),bty="n")
+text(mds9, labels=colnames(k9a) ,cex=1.1)
+dev.off()
+
 mds36 <- cmdscale(dist(t(k36a)))
 cols=rep(c("pink","lightblue"),6)
 XMIN=min(mds36[,1])*1.1
 XMAX=max(mds36[,1])*1.1
 plot(mds36, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main="H3K36ac",xlim=c(XMIN,XMAX),bty="n")
 text(mds36, labels=colnames(k9a) ,cex=1.1)
+
+pdf("k36a_mds.pdf",width=5,height=5)
+plot(mds36, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main="H3K36ac",xlim=c(XMIN,XMAX),bty="n")
+text(mds36, labels=colnames(k9a) ,cex=1.1)
+dev.off()
 
 allac <- cbind(k9a,k36a)
 mycolnames <- colnames(allac)
@@ -156,6 +170,13 @@ plot(log10(dk9$baseMean),dk9$log2FoldChange,cex=0.5,pch=19,col="darkgray",
 points(log10(sig9$baseMean),sig9$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
 
+pdf("k9a_smear.pdf",width=5,height=5)
+plot(log10(dk9$baseMean),dk9$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+  xlab="log10 basemean",ylab="log2 fold change",main="H3K9ac")
+points(log10(sig9$baseMean),sig9$log2FoldChange,cex=0.5,pch=19,col="black")
+mtext(HEADER)
+dev.off()
+
 ```
 
 Now for H3K36a
@@ -197,6 +218,13 @@ plot(log10(dk36$baseMean),dk36$log2FoldChange,cex=0.5,pch=19,col="darkgray",
   xlab="log10 basemean",ylab="log2 fold change",main="H3K9ac")
 points(log10(sig36$baseMean),sig36$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
+
+pdf("k36a_smear.pdf",width=5,height=5)
+plot(log10(dk36$baseMean),dk36$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+  xlab="log10 basemean",ylab="log2 fold change",main="H3K9ac")
+points(log10(sig36$baseMean),sig36$log2FoldChange,cex=0.5,pch=19,col="black")
+mtext(HEADER)
+dev.off()
 
 ```
 
@@ -241,6 +269,11 @@ vec <- vec[order(vec)]
 barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="H3K9ac",xlab="ES")
 grid()
 
+pdf("k9a_mitchbar.pdf",width=7,height=7)
+barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="H3K9ac",xlab="ES")
+grid()
+dev.off()
+
 par(mar=c(5.1, 4.1, 4.1, 2.1))
 
 ```
@@ -276,6 +309,11 @@ vec <- vec[order(vec)]
 barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="H3K36ac",xlab="ES")
 grid()
 
+pdf("k36a_mitchbar.pdf",width=7,height=7)
+barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="H3K36ac",xlab="ES")
+grid()
+dev.off()
+
 par(mar=c(5.1, 4.1, 4.1, 2.1))
 
 ```
@@ -294,6 +332,12 @@ rpm9_SLC2A4 <- rpm9_SLC2A4[c(2,1),]
 barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K9ac",ylab="counts per million",xlab="participant",ylim=c(0,73))
 legend(11.5,73, legend=c("Pre", "Post"), fill=c("#0047AB", "#D2042D"), cex=1)
 
+pdf("k9a_SLC2A4.pdf",width=5,height=5)
+barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K9ac",ylab="counts per million",xlab="participant",ylim=c(0,73))
+legend(11.5,73, legend=c("Pre", "Post"), fill=c("#0047AB", "#D2042D"), cex=1)
+dev.off()
+
+
 rpm36_SLC2A4 <- rpm36[grep("SLC2A4",rownames(rpm36)),]
 rpm36_SLC2A4
 rpm36_SLC2A4 <- colSums(rpm36_SLC2A4)
@@ -303,6 +347,11 @@ rownames(rpm36_SLC2A4) <- c("Post","Pre")
 rpm36_SLC2A4 <- rpm36_SLC2A4[c(2,1),]
 barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K36ac",ylab="counts per million",xlab="participant",ylim=c(0,70))
 legend(3.5,70, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+
+pdf("k36a_SLC2A4.pdf",width=5,height=5)
+barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K36ac",ylab="counts per million",xlab="participant",ylim=c(0,70))
+legend(3.5,70, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+dev.off()
 
 ```
 

@@ -80,6 +80,11 @@ XMAX=max(mds[,1])*1.1
 plot(mds, xlab="Coordinate 1", ylab="Coordinate 2", xlim=c(XMIN,XMAX), cex=2,col=cols,pch=19,main="RNA expression", bty="n")
 text(mds, labels=colnames(xx) ,cex=1.1)
 
+pdf("rna_mds.pdf",width=5,height=5)
+plot(mds, xlab="Coordinate 1", ylab="Coordinate 2", xlim=c(XMIN,XMAX), cex=2,col=cols,pch=19,main="RNA expression", bty="n")
+text(mds, labels=colnames(xx) ,cex=1.1)
+dev.off()
+
 ```
 
 ## DESeq2
@@ -146,6 +151,12 @@ plot(log10(dge$baseMean),dge$log2FoldChange,cex=0.5,pch=19,col="darkgray",
 points(log10(sig$baseMean),sig$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
 
+pdf("rna_smear.pdf",width=5,height=5)
+plot(log10(dge$baseMean),dge$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+  xlab="log10 basemean",ylab="log2 fold change",main="RNA expression")
+points(log10(sig$baseMean),sig$log2FoldChange,cex=0.5,pch=19,col="black")
+mtext(HEADER)
+dev.off()
 
 ```
 
@@ -185,6 +196,10 @@ vec <- vec[order(vec)]
 barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="Pre vs Post Exercise",xlab="ES")
 grid()
 
+pdf("rna_mitchbar.pdf",width=7,height=7)
+barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="Pre vs Post Exercise",xlab="ES")
+grid()
+dev.off()
 par(mar=c(5.1, 4.1, 4.1, 2.1))
 
 ```
@@ -203,6 +218,12 @@ SLC2A4 <- SLC2A4[c(2,1),]
 barplot(SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),ylim=c(0,300),
   main="SLC2A4 mRNA",ylab="counts per million",xlab="participant")
 legend(11,300, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+
+pdf("rna_SLC2A4.pdf",width=5,height=5)
+barplot(SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),ylim=c(0,300),
+  main="SLC2A4 mRNA",ylab="counts per million",xlab="participant")
+legend(11,300, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+dev.off()
 
 tpm <- apply(x[,1:12], 2 , function(x) { x / sum(x) } ) * 1000000
 tpm <- tpm[rowMeans(tpm) > 1,]
