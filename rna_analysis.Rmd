@@ -26,6 +26,7 @@ suppressPackageStartupMessages({
     library("limma")
     library("topconfects")
     library("beeswarm")
+    library("kableExtra")
 })
 
 ```
