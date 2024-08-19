@@ -5,7 +5,7 @@ FROM bioconductor/bioconductor_docker:RELEASE_3_19
 RUN apt-get update \
         && apt upgrade -y \
         && apt install -y nano git libncurses-dev xorg openbox \
-        && apt install -y samtools bwa kallisto \
+        && apt install -y samtools bwa kallisto bedtools parallel pigz \
         && pip install magic-wormhole           \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
@@ -40,5 +40,7 @@ RUN git clone https://github.com/markziemann/exercise_histone.git
 # Set the container working directory
 
 ENV DIRPATH /exercise_histone
+
+#COPY raw_data $DIRPATH
 
 WORKDIR $DIRPATH
