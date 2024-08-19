@@ -59,6 +59,11 @@ rpm <- apply(xx, 2 , function(x) { x / sum(x) } ) * 1000000
 rpm <- rpm[rowMeans(rpm) > 1,]
 dim(rpm)
 
+# gene table
+gt <- as.data.frame(rownames(xx))
+gt$genesymbol <- sapply(strsplit(gt[,1]," "),"[[",2)
+write.table(x=gt,file="gt.tsv",sep="\t")
+
 ```
 
 ## MDS Plot
