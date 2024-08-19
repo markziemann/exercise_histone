@@ -95,7 +95,10 @@ zz <- cbind(as.data.frame(z),assay(vsd))
 dge_unpaired <- as.data.frame(zz[order(zz$pvalue),])
 write.table(dge_unpaired,file="rna_deseq_unpaired.tsv",quote=F,sep="\t")
 
-head(dge_unpaired)
+head(dge_unpaired) |>
+  kbl(caption = "Top significant genes in unpaired analysis)") |>
+  kable_paper("hover", full_width = F)
+
 nrow(subset(dge_unpaired,padj<0.05 & log2FoldChange > 0))
 nrow(subset(dge_unpaired,padj<0.05 & log2FoldChange < 0))
 
@@ -107,7 +110,10 @@ zz <- cbind(as.data.frame(z),assay(vsd))
 dge <- as.data.frame(zz[order(zz$pvalue),])
 write.table(dge,file="rna_deseq.tsv",quote=F,sep="\t")
 
-head(dge)
+head(dge) |>
+  kbl(caption = "Top significant genes in paired analysis)") |>
+  kable_paper("hover", full_width = F)
+
 nrow(subset(dge,padj<0.05 & log2FoldChange > 0))
 nrow(subset(dge,padj<0.05 & log2FoldChange < 0))
 
@@ -127,12 +133,12 @@ m <- mitch_import(x=dge,DEtype="deseq2",geneTable=gt)
 head(m)
 mres <- mitch_calc(x=m,genesets=pw,minsetsize=5,cores=8,priority="effect")
 
-head(subset(mres$enrichment_result,p.adjustANOVA<0.05 & s.dist>0),50) %>%
-  kbl(caption = "Top upregulated GO terms based on effect size (FDR<0.05)") %>%
+head(subset(mres$enrichment_result,p.adjustANOVA<0.05 & s.dist>0),50) |>
+  kbl(caption = "Top upregulated GO terms based on effect size (FDR<0.05)") |>
   kable_paper("hover", full_width = F)
 
-head(subset(mres$enrichment_result,p.adjustANOVA<0.05 & s.dist<0),50) %>%
-  kbl(caption = "Top downregulated GO terms based on effect size (FDR<0.05)") %>%
+head(subset(mres$enrichment_result,p.adjustANOVA<0.05 & s.dist<0),50) |>
+  kbl(caption = "Top downregulated GO terms based on effect size (FDR<0.05)") |>
   kable_paper("hover", full_width = F)
 
 par(mar=c(5,27,3,3))
