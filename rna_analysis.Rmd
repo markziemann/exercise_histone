@@ -11,10 +11,9 @@ output:
 theme: cosmo
 ---
 
-# Introduction
+## Introduction
 
 
-# Packages 
 
 ```{r,packages}
 
@@ -31,11 +30,13 @@ suppressPackageStartupMessages({
 
 ```
 
-# Import read counts
+## Import read counts
+
+Rename samples. Don't use initials.
 
 ```{r,importdata}
 
-tmp <- read.table("3col.tsv",header=F)
+tmp <- read.table("raw_data/rna/3col.tsv.gz",header=F)
 x <- as.matrix(acast(tmp, V2~V1, value.var="V3", fun.aggregate = sum))
 x <- as.data.frame(x)
 accession <- sapply((strsplit(rownames(x),"\\|")),"[[",2)
@@ -49,8 +50,113 @@ xx$geneid = NULL
 xx <- round(xx)
 dim(xx)
 
+colSums(xx)
+
+colnames(xx) <- c("pos1","pre1","pos2","pre2","pos3","pre3","pos4","pre4","pos5","pre5","pos6","pre6")
+
 rpm <- apply(xx, 2 , function(x) { x / sum(x) } ) * 1000000
 rpm <- rpm[rowMeans(rpm) > 1,]
 dim(rpm)
+
+```
+
+## MDS Plot
+
+```{r,mds1}
+
+mds <- cmdscale(dist(t(xx)))
+cols=rep(c("pink","lightblue"),6)
+plot(mds, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19)
+text(mds, labels=colnames(xx) ,cex=1.5)
+
+```
+
+## DESeq2
+
+Sample sheet then differential analysis.
+
+Remove genes with less than 10 reads per sample on average.
+
+```{r,deseq1}
+
+ss <- as.data.frame(colnames(xx))
+ss$pos <- factor(grepl("pos",ss[,1]))
+ss$participant <- c("1","1","2","2","3","3","4","4","5","5","6","6")
+
+dim(xx)
+xx <- xx[rowMeans(xx)>=10,]
+dim(xx)
+
+dds <- DESeqDataSetFromMatrix(countData = xx , colData = ss, design = ~ pos )
+res <- DESeq(dds)
+z <- results(res)
+vsd <- vst(dds, blind=FALSE)
+zz <- cbind(as.data.frame(z),assay(vsd))
+dge_unpaired <- as.data.frame(zz[order(zz$pvalue),])
+write.table(dge_unpaired,file="rna_deseq_unpaired.tsv",quote=F,sep="\t")
+
+head(dge_unpaired)
+nrow(subset(dge_unpaired,padj<0.05 & log2FoldChange > 0))
+nrow(subset(dge_unpaired,padj<0.05 & log2FoldChange < 0))
+
+dds <- DESeqDataSetFromMatrix(countData = xx , colData = ss, design = ~ participant + pos )
+res <- DESeq(dds)
+z <- results(res)
+vsd <- vst(dds, blind=FALSE)
+zz <- cbind(as.data.frame(z),assay(vsd))
+dge <- as.data.frame(zz[order(zz$pvalue),])
+write.table(dge,file="rna_deseq.tsv",quote=F,sep="\t")
+
+head(dge)
+nrow(subset(dge,padj<0.05 & log2FoldChange > 0))
+nrow(subset(dge,padj<0.05 & log2FoldChange < 0))
+
+```
+
+## Mitch
+
+```{r,mitch1}
+
+pw <- gmt_import("ref/c5.go.v2024.1.Hs.symbols.gmt")
+
+names(pw) <- gsub("_", " ", names(pw))
+
+gt <- as.data.frame(rownames(dge))
+gt$genesymbol <- sapply(strsplit(gt[,1]," "),"[[",2)
+m <- mitch_import(x=dge,DEtype="deseq2",geneTable=gt)
+head(m)
+mres <- mitch_calc(x=m,genesets=pw,minsetsize=5,cores=8,priority="effect")
+
+head(subset(mres$enrichment_result,p.adjustANOVA<0.05 & s.dist>0),50) %>%
+  kbl(caption = "Top upregulated GO terms based on effect size (FDR<0.05)") %>%
+  kable_paper("hover", full_width = F)
+
+head(subset(mres$enrichment_result,p.adjustANOVA<0.05 & s.dist<0),50) %>%
+  kbl(caption = "Top downregulated GO terms based on effect size (FDR<0.05)") %>%
+  kable_paper("hover", full_width = F)
+
+par(mar=c(5,27,3,3))
+top <- mres$enrichment_result
+top <- subset(top,p.adjustANOVA<0.05)
+nrow(top)
+up <- head(subset(top,s.dist>0),20)
+dn <- head(subset(top,s.dist<0),20)
+top <- rbind(up,dn)
+vec=top$s.dist
+names(vec)=top$set
+names(vec) <- gsub("_"," ",names(vec))
+vec <- vec[order(vec)]
+barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="Pre vs Post Exercise",xlab="ES")
+grid()
+
+par(mar=c(5.1, 4.1, 4.1, 2.1))
+
+```
+
+## Session
+
+```{r,session}
+
+sessionInfo()
 
 ```
