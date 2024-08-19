@@ -16,7 +16,7 @@ done
 
 for BAM in *bam ; do samtools index $BAM & done ; wait
 
-featureCounts -T 16 -d 30 -Q 10 -F SAF -a $TSS -o h3k9_counts.tsv *bam
+featureCounts -f -O -T 16 -d 30 -Q 10 -F SAF -a $TSS -o h3k9_counts.tsv *bam
 
 cd ../h3k36ac/
 
@@ -30,4 +30,4 @@ done
 
 for BAM in *bam ; do samtools index $BAM & done ; wait
 
-featureCounts -T 16 -d 30 -Q 10 -F SAF -a $TSS -o h3k36_counts.tsv *bam
+featureCounts -f -O -T 16 -d 30 -Q 10 -F SAF -a $TSS -o h3k36_counts.tsv *bam
