@@ -273,7 +273,7 @@ vec=top$s.dist
 names(vec)=top$set
 names(vec) <- gsub("_"," ",names(vec))
 vec <- vec[order(vec)]
-barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="H3K9ac",xlab="ES")
+barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="H3K36ac",xlab="ES")
 grid()
 
 par(mar=c(5.1, 4.1, 4.1, 2.1))
