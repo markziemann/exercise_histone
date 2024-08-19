@@ -6,8 +6,8 @@ output:
   html_document:
     toc: true
     toc_float: true
-    fig_width: 7
-    fig_height: 7
+    fig_width: 5
+    fig_height: 5
 theme: cosmo
 ---
 
@@ -72,7 +72,7 @@ write.table(x=gt,file="gt.tsv",sep="\t")
 
 mds <- cmdscale(dist(t(xx)))
 cols=rep(c("pink","lightblue"),6)
-plot(mds, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19)
+plot(mds, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main="RNA expression")
 text(mds, labels=colnames(xx) ,cex=1.5)
 
 ```
@@ -146,7 +146,7 @@ mtext(HEADER)
 
 ## Mitch
 
-```{r,mitch1}
+```{r,mitch1,fig.height=7,fig.width=7}
 
 pw <- gmt_import("ref/c5.go.v2024.1.Hs.symbols.gmt")
 
@@ -183,6 +183,31 @@ grid()
 par(mar=c(5.1, 4.1, 4.1, 2.1))
 
 ```
+
+## SLC
+
+```{r,slc1,fig.height=5,fig.width=5}
+
+
+SLC2A4 <- rpm[grep("ENSG00000181856",rownames(rpm)),]
+SLC2A4
+SLC2A4 <- matrix(SLC2A4,nrow=2)
+colnames(SLC2A4) <- 1:6
+rownames(SLC2A4) <- c("Post","Pre")
+SLC2A4 <- SLC2A4[c(2,1),]
+barplot(SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),ylim=c(0,300),
+  main="SLC2A4 mRNA",ylab="counts per million",xlab="participant")
+legend(13,290, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+
+tpm <- apply(x[,1:12], 2 , function(x) { x / sum(x) } ) * 1000000
+tpm <- tpm[rowMeans(tpm) > 1,]
+dim(tpm)
+SLC2A4 <- tpm[grep("ENSG00000181856",rownames(tpm)),]
+rownames(SLC2A4) <- sapply(strsplit(rownames(SLC2A4),"\\|"),"[[",1)
+SLC2A4
+
+```
+
 
 ## Session
 
