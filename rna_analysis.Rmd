@@ -120,6 +120,25 @@ nrow(subset(dge,padj<0.05 & log2FoldChange < 0))
 
 ```
 
+Smear plot
+
+
+```{r,smearplot}
+
+sig <- subset(dge,padj<0.05)
+NSIG=nrow(sig)
+NDOWN=nrow(subset(sig,log2FoldChange<0))
+NUP=nrow(subset(sig,log2FoldChange>0))
+NTOT=nrow(dge)
+HEADER=paste(NTOT,"genes detected;",NSIG,"@5%FDR;",NUP,"up",NDOWN,"down")
+plot(log10(dge$baseMean),dge$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+  xlab="log10 basemean",ylab="log2 fold change",main="RNA expression")
+points(log10(sig$baseMean),sig$log2FoldChange,cex=0.5,pch=19,col="black")
+mtext(HEADER)
+
+
+```
+
 ## Mitch
 
 ```{r,mitch1}
