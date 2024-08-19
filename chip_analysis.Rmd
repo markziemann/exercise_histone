@@ -291,8 +291,8 @@ rpm9_SLC2A4 <- matrix(rpm9_SLC2A4,nrow=2)
 colnames(rpm9_SLC2A4) <- 1:6
 rownames(rpm9_SLC2A4) <- c("Post","Pre")
 rpm9_SLC2A4 <- rpm9_SLC2A4[c(2,1),]
-barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K9ac",ylab="counts per million",xlab="participant")
-legend(11,67, legend=c("Pre", "Post"), fill=c("#0047AB", "#D2042D"), cex=1)
+barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K9ac",ylab="counts per million",xlab="participant",ylim=c(0,70))
+legend(11.5,67, legend=c("Pre", "Post"), fill=c("#0047AB", "#D2042D"), cex=1)
 
 rpm36_SLC2A4 <- rpm36[grep("SLC2A4",rownames(rpm36)),]
 rpm36_SLC2A4
@@ -301,8 +301,8 @@ rpm36_SLC2A4 <- matrix(rpm36_SLC2A4,nrow=2)
 colnames(rpm36_SLC2A4) <- 1:6
 rownames(rpm36_SLC2A4) <- c("Post","Pre")
 rpm36_SLC2A4 <- rpm36_SLC2A4[c(2,1),]
-barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K36ac",ylab="counts per million",xlab="participant")
-legend(4,60, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K36ac",ylab="counts per million",xlab="participant",ylim=c(0,70))
+legend(3.5,70, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
 
 ```
 
