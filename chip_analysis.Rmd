@@ -221,7 +221,7 @@ mtext(HEADER)
 
 pdf("k36a_smear.pdf",width=5,height=5)
 plot(log10(dk36$baseMean),dk36$log2FoldChange,cex=0.5,pch=19,col="darkgray",
-  xlab="log10 basemean",ylab="log2 fold change",main="H3K9ac")
+  xlab="log10 basemean",ylab="log2 fold change",main="H3K36ac")
 points(log10(sig36$baseMean),sig36$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
 dev.off()
