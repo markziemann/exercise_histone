@@ -215,7 +215,7 @@ NUP=nrow(subset(sig36,log2FoldChange>0))
 NTOT=nrow(dk36)
 HEADER=paste(NTOT,"TSSs detected;",NSIG,"@5%FDR;",NUP,"up",NDOWN,"down")
 plot(log10(dk36$baseMean),dk36$log2FoldChange,cex=0.5,pch=19,col="darkgray",
-  xlab="log10 basemean",ylab="log2 fold change",main="H3K9ac")
+  xlab="log10 basemean",ylab="log2 fold change",main="H3K36ac")
 points(log10(sig36$baseMean),sig36$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
 
