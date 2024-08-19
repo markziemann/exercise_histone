@@ -197,6 +197,7 @@ barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="Pre vs P
 grid()
 
 pdf("rna_mitchbar.pdf",width=7,height=7)
+par(mar=c(5,27,3,3))
 barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="Pre vs Post Exercise",xlab="ES")
 grid()
 dev.off()
