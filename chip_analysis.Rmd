@@ -16,6 +16,7 @@ theme: cosmo
 ```{r,packages}
 
 suppressPackageStartupMessages({
+    library("RhpcBLASctl")
     library("reshape2")
     library("DESeq2")
     library("gplots")
@@ -26,6 +27,8 @@ suppressPackageStartupMessages({
     library("beeswarm")
     library("kableExtra")
 })
+
+RhpcBLASctl::blas_set_num_threads(1)
 
 ```
 
