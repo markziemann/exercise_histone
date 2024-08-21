@@ -277,6 +277,10 @@ dev.off()
 
 par(mar=c(5.1, 4.1, 4.1, 2.1))
 
+if (! file.exists("k9a_mitch.html") ) {
+  mitch_report(mres9,"k9a_mitch.html")
+}
+
 ```
 
 H3K36ac
@@ -317,6 +321,10 @@ grid()
 dev.off()
 
 par(mar=c(5.1, 4.1, 4.1, 2.1))
+
+if (! file.exists("k36a_mitch.html") ) {
+  mitch_report(mres36,"k36a_mitch.html")
+}
 
 ```
 

@@ -203,6 +203,10 @@ grid()
 dev.off()
 par(mar=c(5.1, 4.1, 4.1, 2.1))
 
+if (! file.exists("rna_mitch.html") ) {
+  mitch_report(mres,"rna_mitch.html")
+}
+
 ```
 
 ## SLC
