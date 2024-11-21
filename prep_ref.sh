@@ -30,7 +30,7 @@ zcat gencode.v46.primary_assembly.annotation.gtf.gz \
 | tr -d '"' \
 | sort -u >> tss.tsv
 
-awk '{OFS="\t"}{print $1,$2,$2+1,$3}' tss.tsv > tss1bp.bed
+awk '{OFS="\t"}{print $1,$2,$2+1,$3}' tss.tsv | bedtools sort > tss1bp.bed
 
 # expand TSS windows with slop
 gunzip -k GRCh38.primary_assembly.genome.fa.gz
