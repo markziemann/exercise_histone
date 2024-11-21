@@ -30,10 +30,14 @@ zcat gencode.v46.primary_assembly.annotation.gtf.gz \
 | tr -d '"' \
 | sort -u >> tss.tsv
 
+awk '{OFS="\t"}{print $1,$2,$2+1,$3}' tss.tsv > tss1bp.bed
+
 # expand TSS windows with slop
 gunzip -k GRCh38.primary_assembly.genome.fa.gz
 samtools faidx GRCh38.primary_assembly.genome.fa && rm  GRCh38.primary_assembly.genome.fa
 cut -f-2 GRCh38.primary_assembly.genome.fa.fai > GRCh38.primary_assembly.genome.fa.g
+
+
 
 awk '{OFS="\t"}{print $1,$2,$2,$3}' tss.tsv \
 | bedtools slop -b 2000  -g GRCh38.primary_assembly.genome.fa.g \
