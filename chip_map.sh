@@ -31,3 +31,12 @@ done
 for BAM in *bam ; do samtools index $BAM & done ; wait
 
 featureCounts -f -O -T 16 -d 30 -Q 10 -F SAF -a $TSS -o h3k36_counts.tsv *bam
+
+for BAM in *bam ; do
+  POS=$BAM.pos
+  bamToBed -i $BAM \
+  | awk ' {OFS="\t"} { if ($6=="+") { print $1,$2+99,$2+100 } else { print $1,$3-100,$3-99 } } ' \
+  | awk '$2>0 && $3>0' \
+  | bedtools sort \
+  |  bedtools closest -D b -a - -b ../../ref/tss1bp.bed > $POS
+done
