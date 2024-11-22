@@ -32,6 +32,76 @@ RhpcBLASctl::blas_set_num_threads(1)
 
 ```
 
+## Import and analyse read positions
+
+
+```{r,readpos}
+
+myfiles <- list.files(".",pattern="*pos2")
+res <- sapply(myfiles,function(f) {
+  x <- read.table(f,header=FALSE)
+  x <- x[grep("chr",x$V1),]
+  x <- subset(x, V8 < 10000 & V8 > -10000 )
+  xh <- hist(x$V8,breaks=200)
+  xh$counts
+} )
+
+# normalise
+y <- apply(res , 2, function(x) { x/sum(x)*100 } )
+
+# plot all
+plot(-100:99*10,res[,1]/sum(res[,1])*100,type="p",cex=0,ylim=c(0,3),
+  xlab="Distance to TSS", ylab="read density")
+
+lapply(1:ncol(res) , function(i) {
+  y <- res[,i]/sum(res[,i])*100
+  points(-100:99*10,y,type="l",col=i%%2+1)
+} )
+
+
+# plot each
+
+par(mfrow=c(3,2))
+
+plot(-100:99*10,y[,2],type="l",cex=1,ylim=c(0,3), main="P1",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,1],type="l",col="red")
+
+plot(-100:99*10,y[,4],type="l",cex=1,ylim=c(0,3), main="P2",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,3],type="l",col="red")
+
+plot(-100:99*10,y[,6],type="l",cex=1,ylim=c(0,3), main="P3",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,5],type="l",col="red")
+
+plot(-100:99*10,y[,8],type="l",cex=1,ylim=c(0,3), main="P4",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,7],type="l",col="red")
+
+plot(-100:99*10,y[,10],type="l",cex=1,ylim=c(0,3), main="P5",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,9],type="l",col="red")
+
+plot(-100:99*10,y[,12],type="l",cex=1,ylim=c(0,3), main="P6",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,11],type="l",col="red")
+
+par(mfrow=c(1,1))
+
+
+## plot mean pre
+
+pre <- rowMeans(y[,seq(2,12,2)])
+pos <- rowMeans(y[,seq(1,12,2)])
+
+plot(-100:99*10,pre,type="l",cex=1,ylim=c(0.3,2.5), main="Pre v post",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,pos,type="l",col="red")
+
+```
+
+
 ## Import read counts
 
 Rename samples. Don't use initials.

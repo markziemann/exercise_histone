@@ -5,14 +5,14 @@ FROM bioconductor/bioconductor_docker:RELEASE_3_19
 RUN apt-get update \
         && apt upgrade -y \
         && apt install -y nano git libncurses-dev xorg openbox \
-        && apt install -y samtools bwa kallisto bedtools parallel pigz \
+        && apt install -y samtools bwa kallisto bedtools parallel pigz sra-toolkit \
         && pip install magic-wormhole           \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
 
 # Install CRAN packages
 
-RUN Rscript -e 'install.packages(c("zoo","tidyverse","reshape2","gplots","MASS","eulerr","kableExtra","vioplot","pkgload","beeswarm"))'
+RUN Rscript -e 'install.packages(c("RhpcBLASctl","zoo","tidyverse","reshape2","gplots","MASS","eulerr","kableExtra","vioplot","pkgload","beeswarm"))'
 
 # Install bioconductor packages
 

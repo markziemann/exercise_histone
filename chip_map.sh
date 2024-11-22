@@ -6,6 +6,29 @@ IDX=../../ref/GRCh38.primary_assembly.genome.fa.gz
 
 TSS=../../ref/tss_merged.saf
 
+## get input samples SRR10842906 SRR10842907 SRR10842908 SRR10842909
+prefetch SRR10842906,SRR10842907,SRR10842908,SRR10842909
+
+mv SRR10842906/SRR10842906.sra .
+mv SRR10842907/SRR10842907.sra .
+mv SRR10842908/SRR10842908.sra .
+mv SRR10842909/SRR10842909.sra .
+
+fastq-dump --split-files SRR10842906.sra
+fastq-dump --split-files SRR10842907.sra
+fastq-dump --split-files SRR10842908.sra
+fastq-dump --split-files SRR10842909.sra
+
+rm SRR10842906.sra SRR10842907.sra SRR10842908.sra SRR10842909.sra
+
+for FQ in *fastq ; do
+
+  BAM=$(echo $FQ | sed 's/.fastq/.bam/')
+
+  bwa mem -t 16 $IDX $FQ | samtools sort -@8 -o $BAM -
+
+done
+
 for FQZ in *fq.gz ; do
 
   BAM=$(echo $FQZ | sed 's/.fq.gz/.bam/')
