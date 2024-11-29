@@ -71,7 +71,7 @@ done
 for POS in *pos ; do
   grep chr $POS \
   | cut -f 7 \
-  | sort \
+  | parsort --parallel=16 \
   | uniq -c \
   | sort -k1nr \
   | tr '.' '\t' \
@@ -81,7 +81,7 @@ done
 # Curate a list of canonical TSSs (most reads) for each gene
 awk '{OFS="\t"}{print $0,$0}' *tss  \
 | sed 's#\.#\t#' \
-| sort \
+| parsort --parallel=16 \
 | uniq -c \
 | sort -k1nr \
 | awk '!arr[$2]++ {print $4}' > maintss.txt

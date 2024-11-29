@@ -34,10 +34,11 @@ RhpcBLASctl::blas_set_num_threads(1)
 
 ## Import and analyse read positions
 
+Firstly for H3K9ac.
 
-```{r,readpos}
+```{r,readpos1}
 
-myfiles <- list.files(".",pattern="*pos2")
+myfiles <- list.files("raw_data/h3k9ac/",pattern="*pos2",full.names=TRUE)
 res <- sapply(myfiles,function(f) {
   x <- read.table(f,header=FALSE)
   x <- x[grep("chr",x$V1),]
@@ -45,6 +46,9 @@ res <- sapply(myfiles,function(f) {
   xh <- hist(x$V8,breaks=200)
   xh$counts
 } )
+
+inputs <- res[,grep("SRR",colnames(res))]
+res <- res[,grep("SRR",colnames(res),invert=TRUE)]
 
 # normalise
 y <- apply(res , 2, function(x) { x/sum(x)*100 } )
@@ -58,11 +62,13 @@ lapply(1:ncol(res) , function(i) {
   points(-100:99*10,y,type="l",col=i%%2+1)
 } )
 
+lapply(1:ncol(inputs) , function(i) {
+  y <- inputs[,i]/sum(inputs[,i])*100
+  points(-100:99*10,y,type="l",col="blue")
+} )
 
 # plot each
-
 par(mfrow=c(3,2))
-
 plot(-100:99*10,y[,2],type="l",cex=1,ylim=c(0,3), main="P1",
   xlab="Distance to TSS", ylab="read density",col="black")
 points(-100:99*10,y[,1],type="l",col="red")
@@ -89,22 +95,153 @@ points(-100:99*10,y[,11],type="l",col="red")
 
 par(mfrow=c(1,1))
 
-
-## plot mean pre
-
-pre <- rowMeans(y[,seq(2,12,2)])
-pos <- rowMeans(y[,seq(1,12,2)])
-
-plot(-100:99*10,pre,type="l",cex=1,ylim=c(0.3,2.5), main="Pre v post",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,pos,type="l",col="red")
+k9pre <- rowMeans(y[,seq(2,12,2)])
+k9pos <- rowMeans(y[,seq(1,12,2)])
 
 ```
+
+Now for H3K36ac.
+
+```{r,readpos1}
+
+myfiles <- list.files("raw_data/h3k36ac/",pattern="*pos2",full.names=TRUE)
+res <- sapply(myfiles,function(f) {
+  x <- read.table(f,header=FALSE)
+  x <- x[grep("chr",x$V1),]
+  x <- subset(x, V8 < 10000 & V8 > -10000 )
+  xh <- hist(x$V8,breaks=200)
+  xh$counts
+} )
+
+inputs <- res[,grep("SRR",colnames(res))]
+res <- res[,grep("SRR",colnames(res),invert=TRUE)]
+
+# normalise
+y <- apply(res , 2, function(x) { x/sum(x)*100 } )
+
+# plot all
+plot(-100:99*10,res[,1]/sum(res[,1])*100,type="p",cex=0,ylim=c(0,3),
+  xlab="Distance to TSS", ylab="read density")
+
+lapply(1:ncol(res) , function(i) {
+  y <- res[,i]/sum(res[,i])*100
+  points(-100:99*10,y,type="l",col=i%%2+1)
+} )
+
+lapply(1:ncol(inputs) , function(i) {
+  y <- inputs[,i]/sum(inputs[,i])*100
+  points(-100:99*10,y,type="l",col="blue")
+} )
+
+# plot each
+par(mfrow=c(3,2))
+plot(-100:99*10,y[,2],type="l",cex=1,ylim=c(0,3), main="P1",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,1],type="l",col="red")
+
+plot(-100:99*10,y[,4],type="l",cex=1,ylim=c(0,3), main="P2",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,3],type="l",col="red")
+
+plot(-100:99*10,y[,6],type="l",cex=1,ylim=c(0,3), main="P3",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,5],type="l",col="red")
+
+plot(-100:99*10,y[,8],type="l",cex=1,ylim=c(0,3), main="P4",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,7],type="l",col="red")
+
+plot(-100:99*10,y[,10],type="l",cex=1,ylim=c(0,3), main="P5",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,9],type="l",col="red")
+
+plot(-100:99*10,y[,12],type="l",cex=1,ylim=c(0,3), main="P6",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,y[,11],type="l",col="red")
+
+k36pre <- rowMeans(y[,seq(2,12,2)])
+k36pos <- rowMeans(y[,seq(1,12,2)])
+
+par(mfrow=c(1,1))
+
+```
+
+Now plot mean pre for both k9 and k36.
+
+```{r,plot_mean}
+
+par(mfrow=c(2,1))
+
+plot(-100:99*10,k9pre,type="l",cex=1,ylim=c(0.3,2.5), main="H3K9ac Pre v post",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,k9pos,type="l",col="red")
+
+plot(-100:99*10,k36pre,type="l",cex=1,ylim=c(0.3,2.5), main="H3K36ac Pre v post",
+  xlab="Distance to TSS", ylab="read density",col="black")
+points(-100:99*10,k36pos,type="l",col="red")
+
+par(mfrow=c(1,1))
+
+```
+
+
+
 
 
 ## Import read counts
 
 Rename samples. Don't use initials.
+
+```{r,summary}
+
+k9s <- read.table("raw_data/h3k9ac/h3k9_counts.tsv.summary",header=TRUE,row.names=1)
+inputs <- k9s[,grep("SRR",colnames(k9s))]
+k9s <- k9s[,grep("SRR",colnames(k9s),invert=TRUE)]
+colnames(k9s) <- c("pos1","pre1","pos2","pre2","pos3","pre3","pos4","pre4","pos5","pre5","pos6","pre6")
+colnames(inputs) <- c("input1","input2","input3","input4")
+
+inputs
+barplot(as.matrix(inputs))
+inputsn <- apply(inputs,2,function(x) {x/sum(x)} )
+inputsn
+barplot(as.matrix(inputsn))
+
+k9s
+barplot(as.matrix(k9s))
+k9sn <- apply(k9s,2,function(x) {x/sum(x)} )
+k9sn
+barplot(as.matrix(k9sn))
+
+k36s <- read.table("raw_data/h3k36ac/h3k36_counts.tsv.summary",header=TRUE,row.names=1)
+colnames(k36s) <- c("pos1","pre1","pos2","pre2","pos3","pre3","pos4","pre4","pos5","pre5","pos6","pre6")
+k36s
+barplot(as.matrix(k36s))
+k36sn <- apply(k36s,2,function(x) {x/sum(x)} )
+barplot(as.matrix(k36sn))
+
+all <- cbind(inputs,k9s,k36s)
+all
+allsn <- apply(all,2,function(x) {x/sum(x)} )
+barplot(as.matrix(allsn),ylab="proportion of reads",las=2)
+
+k9tss <- k9sn[1,] / (k9sn[1,] + k9sn[12,] )
+inputtss <- unlist(as.vector(inputs[1,] / ( inputs[1,] + inputs[12,] )))
+k36tss <- k36sn[1,] / (k36sn[1,] + k36sn[12,] )
+
+k9tss_pre <- k9tss[grep("pre",names(k9tss))]
+k9tss_post <- k9tss[grep("pos",names(k9tss))]
+k36tss_pre <- k36tss[grep("pre",names(k36tss))]
+k36tss_post <- k36tss[grep("pos",names(k36tss))]
+xl <- list("input"=inputtss,"k9ac pre"=k9tss_pre, "k9ac post"=k9tss_post,
+  "k36ac pre"=k36tss_pre, "k36ac post"=k36tss_post)
+
+boxplot(xl,cex=0,ylab="proportion",main="TSS read fraction",col="white")
+
+beeswarm(xl,add=TRUE,pch=19,cex=1.5,col="darkgray")
+
+```
+
+
 
 ```{r,importdata}
 
@@ -119,11 +256,19 @@ k9a <- merge(k9,gt,by.x="Geneid",by.y="ens",all.x=TRUE)
 
 rownames(k9a) <- paste(k9a$Geneid,k9a$genesymbol,k9a$Chr,k9a$Start,k9a$End)
 
-k9a <- k9a[,7:18]
-colnames(k9a) <- c("pos1","pre1","pos2","pre2","pos3","pre3","pos4","pre4","pos5","pre5","pos6","pre6")
+k9a <- k9a[,7:22]
+colnames(k9a) <- c("pos1","pre1","pos2","pre2","pos3","pre3","pos4","pre4","pos5","pre5",
+  "input1","input2","input3","input4","pos6","pre6")
+
+input <- k9a[,grep("input",colnames(k9a))]
+k9a <- k9a[,grep("input",colnames(k9a),invert=TRUE)]
 
 head(k9a) |>
   kbl(caption = "H3K9ac TSS data") |>
+  kable_paper("hover", full_width = F)
+
+head(input) |>
+  kbl(caption = "Input TSS data") |>
   kable_paper("hover", full_width = F)
 
 colSums(k9a)
@@ -179,12 +324,26 @@ plot(mds36, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main
 text(mds36, labels=colnames(k9a) ,cex=1.1)
 dev.off()
 
+# include input sample
+allac <- cbind(k9a,k36a)
+mycolnames <- colnames(allac)
+colnames(allac) <- paste(c(rep("k9",12),rep("k36",12)),mycolnames)
+allac <- cbind(allac,input)
+
+mdsa <- cmdscale(dist(t(allac)))
+cols=c(rep(c("pink","lightblue"),12),rep("gray",4))
+XMIN=min(mdsa[,1])*1.1
+XMAX=max(mdsa[,1])*1.1
+plot(mdsa, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main="ChIP",xlim=c(XMIN,XMAX),bty="n")
+text(mdsa, labels=colnames(allac) ,cex=1.1)
+
+# Remove input
 allac <- cbind(k9a,k36a)
 mycolnames <- colnames(allac)
 colnames(allac) <- paste(c(rep("k9",12),rep("k36",12)),mycolnames)
 
 mdsa <- cmdscale(dist(t(allac)))
-cols=rep(c("pink","lightblue"),6)
+cols=rep(c("pink","lightblue"),12)
 XMIN=min(mdsa[,1])*1.1
 XMAX=max(mdsa[,1])*1.1
 plot(mdsa, xlab="Coordinate 1", ylab="Coordinate 2", cex=2,col=cols,pch=19,main="ChIP",xlim=c(XMIN,XMAX),bty="n")
