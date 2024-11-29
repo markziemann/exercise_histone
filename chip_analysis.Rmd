@@ -42,7 +42,7 @@ myfiles <- list.files("raw_data/h3k9ac/",pattern="*pos2",full.names=TRUE)
 res <- sapply(myfiles,function(f) {
   x <- read.table(f,header=FALSE)
   x <- x[grep("chr",x$V1),]
-  x <- subset(x, V8 < 10000 & V8 > -10000 )
+  x <- subset(x, V8 < 5000 & V8 > -5000 )
   xh <- hist(x$V8,breaks=200)
   xh$counts
 } )
@@ -54,44 +54,44 @@ res <- res[,grep("SRR",colnames(res),invert=TRUE)]
 y <- apply(res , 2, function(x) { x/sum(x)*100 } )
 
 # plot all
-plot(-100:99*10,res[,1]/sum(res[,1])*100,type="p",cex=0,ylim=c(0,3),
+plot(-100:99*50,res[,1]/sum(res[,1])*100,type="p",cex=0,ylim=c(0,3),
   xlab="Distance to TSS", ylab="read density")
 
 lapply(1:ncol(res) , function(i) {
   y <- res[,i]/sum(res[,i])*100
-  points(-100:99*10,y,type="l",col=i%%2+1)
+  points(-100:99*50,y,type="l",col=i%%2+1)
 } )
 
 lapply(1:ncol(inputs) , function(i) {
   y <- inputs[,i]/sum(inputs[,i])*100
-  points(-100:99*10,y,type="l",col="blue")
+  points(-100:99*50,y,type="l",col="blue")
 } )
 
 # plot each
 par(mfrow=c(3,2))
-plot(-100:99*10,y[,2],type="l",cex=1,ylim=c(0,3), main="P1",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,1],type="l",col="red")
+plot(-100:99*50,y[,2],type="l",cex=1,ylim=c(0,3), main="P1",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*50,y[,1],type="l",col=2)
 
-plot(-100:99*10,y[,4],type="l",cex=1,ylim=c(0,3), main="P2",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,3],type="l",col="red")
+plot(-100:99*50,y[,4],type="l",cex=1,ylim=c(0,3), main="P2",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*50,y[,3],type="l",col=2)
 
-plot(-100:99*10,y[,6],type="l",cex=1,ylim=c(0,3), main="P3",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,5],type="l",col="red")
+plot(-100:99*50,y[,6],type="l",cex=1,ylim=c(0,3), main="P3",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*50,y[,5],type="l",col=2)
 
-plot(-100:99*10,y[,8],type="l",cex=1,ylim=c(0,3), main="P4",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,7],type="l",col="red")
+plot(-100:99*50,y[,8],type="l",cex=1,ylim=c(0,3), main="P4",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*50,y[,7],type="l",col=2)
 
-plot(-100:99*10,y[,10],type="l",cex=1,ylim=c(0,3), main="P5",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,9],type="l",col="red")
+plot(-100:99*50,y[,10],type="l",cex=1,ylim=c(0,3), main="P5",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*50,y[,9],type="l",col=2)
 
-plot(-100:99*10,y[,12],type="l",cex=1,ylim=c(0,3), main="P6",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,11],type="l",col="red")
+plot(-100:99*50,y[,12],type="l",cex=1,ylim=c(0,3), main="P6",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*50,y[,11],type="l",col=2)
 
 par(mfrow=c(1,1))
 
@@ -102,62 +102,54 @@ k9pos <- rowMeans(y[,seq(1,12,2)])
 
 Now for H3K36ac.
 
-```{r,readpos1}
+```{r,readpos2}
 
 myfiles <- list.files("raw_data/h3k36ac/",pattern="*pos2",full.names=TRUE)
 res <- sapply(myfiles,function(f) {
   x <- read.table(f,header=FALSE)
   x <- x[grep("chr",x$V1),]
-  x <- subset(x, V8 < 10000 & V8 > -10000 )
+  x <- subset(x, V8 < 5000 & V8 > -5000 )
   xh <- hist(x$V8,breaks=200)
   xh$counts
 } )
-
-inputs <- res[,grep("SRR",colnames(res))]
-res <- res[,grep("SRR",colnames(res),invert=TRUE)]
 
 # normalise
 y <- apply(res , 2, function(x) { x/sum(x)*100 } )
 
 # plot all
-plot(-100:99*10,res[,1]/sum(res[,1])*100,type="p",cex=0,ylim=c(0,3),
+plot(-100:99*50,res[,1]/sum(res[,1])*100,type="p",cex=0,ylim=c(0.3,1.7),
   xlab="Distance to TSS", ylab="read density")
 
 lapply(1:ncol(res) , function(i) {
   y <- res[,i]/sum(res[,i])*100
-  points(-100:99*10,y,type="l",col=i%%2+1)
-} )
-
-lapply(1:ncol(inputs) , function(i) {
-  y <- inputs[,i]/sum(inputs[,i])*100
-  points(-100:99*10,y,type="l",col="blue")
+  points(-100:99*50,y,type="l",col=i%%2+1)
 } )
 
 # plot each
 par(mfrow=c(3,2))
-plot(-100:99*10,y[,2],type="l",cex=1,ylim=c(0,3), main="P1",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,1],type="l",col="red")
+plot(-100:99*10,y[,2],type="l",cex=1,ylim=c(0.3,1.7), main="P1",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*10,y[,1],type="l",col=2)
 
-plot(-100:99*10,y[,4],type="l",cex=1,ylim=c(0,3), main="P2",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,3],type="l",col="red")
+plot(-100:99*10,y[,4],type="l",cex=1,ylim=c(0.3,1.7), main="P2",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*10,y[,3],type="l",col=2)
 
-plot(-100:99*10,y[,6],type="l",cex=1,ylim=c(0,3), main="P3",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,5],type="l",col="red")
+plot(-100:99*10,y[,6],type="l",cex=1,ylim=c(0.3,1.7), main="P3",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*10,y[,5],type="l",col=2)
 
-plot(-100:99*10,y[,8],type="l",cex=1,ylim=c(0,3), main="P4",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,7],type="l",col="red")
+plot(-100:99*10,y[,8],type="l",cex=1,ylim=c(0.3,1.7), main="P4",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*10,y[,7],type="l",col=2)
 
-plot(-100:99*10,y[,10],type="l",cex=1,ylim=c(0,3), main="P5",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,9],type="l",col="red")
+plot(-100:99*10,y[,10],type="l",cex=1,ylim=c(0.3,1.7), main="P5",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*10,y[,9],type="l",col=2)
 
-plot(-100:99*10,y[,12],type="l",cex=1,ylim=c(0,3), main="P6",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,y[,11],type="l",col="red")
+plot(-100:99*10,y[,12],type="l",cex=1,ylim=c(0.3,1.7), main="P6",
+  xlab="Distance to TSS", ylab="read density",col=4)
+points(-100:99*10,y[,11],type="l",col=2)
 
 k36pre <- rowMeans(y[,seq(2,12,2)])
 k36pos <- rowMeans(y[,seq(1,12,2)])
@@ -172,25 +164,53 @@ Now plot mean pre for both k9 and k36.
 
 par(mfrow=c(2,1))
 
-plot(-100:99*10,k9pre,type="l",cex=1,ylim=c(0.3,2.5), main="H3K9ac Pre v post",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,k9pos,type="l",col="red")
+plot(-100:99*50,k9pre,type="l",cex=1,ylim=c(0.3,2.2),bty="n",lwd=2,
+  xlab="Distance to TSS", ylab="read density",col=4)
+mtext("H3K9ac")
+points(-100:99*50,k9pos,type="l",col=2,lwd=2)
 
-plot(-100:99*10,k36pre,type="l",cex=1,ylim=c(0.3,2.5), main="H3K36ac Pre v post",
-  xlab="Distance to TSS", ylab="read density",col="black")
-points(-100:99*10,k36pos,type="l",col="red")
+legend("topright", legend=c("Post", "Pre"),
+       col=c(2,4), lty=1, cex=0.9, lwd=2)
+
+plot(-100:99*50,k36pre,type="l",cex=1,ylim=c(0.3,1.5),bty="n",lwd=2,
+  xlab="Distance to TSS", ylab="read density",col=4)
+mtext("H3K36ac")
+points(-100:99*50,k36pos,type="l",col=2,lwd=2)
+
+legend("topright", legend=c("Post", "Pre"),
+       col=c(2,4), lty=1, cex=0.9, lwd=2)
 
 par(mfrow=c(1,1))
 
+pdf("chip_tss_mds.pdf",width=5,height=5)
+par(mfrow=c(2,1))
+
+plot(-100:99*50,k9pre,type="l",cex=1,ylim=c(0.3,2.2),bty="n",lwd=2,
+  xlab="Distance to TSS", ylab="read density",col=4)
+mtext("H3K9ac")
+points(-100:99*50,k9pos,type="l",col=2,lwd=2)
+
+legend("topright", legend=c("Post", "Pre"),
+       col=c(2,4), lty=1, cex=0.9, lwd=2)
+
+plot(-100:99*50,k36pre,type="l",cex=1,ylim=c(0.3,1.5),bty="n",lwd=2,
+  xlab="Distance to TSS", ylab="read density",col=4)
+mtext("H3K36ac")
+points(-100:99*50,k36pos,type="l",col=2,lwd=2)
+
+legend("topright", legend=c("Post", "Pre"),
+       col=c(2,4), lty=1, cex=0.9, lwd=2)
+
+par(mfrow=c(1,1))
+dev.off()
+
 ```
-
-
-
-
 
 ## Import read counts
 
 Rename samples. Don't use initials.
+
+Get the proportion of reads that are within 2kbp of TSSs.
 
 ```{r,summary}
 
@@ -232,16 +252,20 @@ k9tss_pre <- k9tss[grep("pre",names(k9tss))]
 k9tss_post <- k9tss[grep("pos",names(k9tss))]
 k36tss_pre <- k36tss[grep("pre",names(k36tss))]
 k36tss_post <- k36tss[grep("pos",names(k36tss))]
-xl <- list("input"=inputtss,"k9ac pre"=k9tss_pre, "k9ac post"=k9tss_post,
-  "k36ac pre"=k36tss_pre, "k36ac post"=k36tss_post)
+xl <- list("Input"=inputtss,"K9ac pre"=k9tss_pre, "K9ac post"=k9tss_post,
+  "K36ac pre"=k36tss_pre, "K36ac post"=k36tss_post)
 
-boxplot(xl,cex=0,ylab="proportion",main="TSS read fraction",col="white")
-
+boxplot(xl,cex=0,ylab="Proportion",main="TSS read fraction",col="white")
 beeswarm(xl,add=TRUE,pch=19,cex=1.5,col="darkgray")
+
+pdf("chip_boxplot_mds.pdf",width=5,height=5)
+boxplot(xl,cex=0,ylab="Proportion",main="TSS read fraction",col="white")
+beeswarm(xl,add=TRUE,pch=19,cex=1.5,col="darkgray")
+dev.off()
 
 ```
 
-
+Inport data.
 
 ```{r,importdata}
 
@@ -375,12 +399,24 @@ zz <- cbind(as.data.frame(z),assay(vsd))
 dk9 <- as.data.frame(zz[order(zz$pvalue),])
 write.table(dk9,file="k9a_deseq.tsv",quote=F,sep="\t")
 
-head(dk9) |>
-  kbl(caption = "Top significant genes in paired analysis for H3K9ac)") |>
+head(subset(dk9,log2FoldChange > 0),20)[,c(1,2,6)] |>
+  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
+  kable_paper("hover", full_width = F)
+
+head(subset(dk9,log2FoldChange < 0),20)[,c(1,2,6)] |>
+  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
   kable_paper("hover", full_width = F)
 
 nrow(subset(dk9,padj<0.05 & log2FoldChange > 0))
 nrow(subset(dk9,padj<0.05 & log2FoldChange < 0))
+
+dk9[grep("SLC2A4",rownames(dk9)),c(1,2,5,6)] |>
+  kbl(caption = "GLUT4 TSS H3K9ac)") |>
+  kable_paper("hover", full_width = F)
+
+dk9[grep("SLC2A",rownames(dk9)),c(1,2,5,6)] |>
+  kbl(caption = "GLUT transporters TSS H3K9ac)") |>
+  kable_paper("hover", full_width = F)
 
 ```
 
@@ -394,17 +430,21 @@ NDOWN=nrow(subset(sig9,log2FoldChange<0))
 NUP=nrow(subset(sig9,log2FoldChange>0))
 NTOT=nrow(dk9)
 HEADER=paste(NTOT,"TSSs detected;",NSIG,"@5%FDR;",NUP,"up",NDOWN,"down")
-plot(log10(dk9$baseMean),dk9$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+plot(log10(dk9$baseMean),dk9$log2FoldChange,cex=0.5,pch=19,col="darkgray",bty="n",
   xlab="log10 basemean",ylab="log2 fold change",main="H3K9ac")
 points(log10(sig9$baseMean),sig9$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
 
 pdf("k9a_smear.pdf",width=5,height=5)
-plot(log10(dk9$baseMean),dk9$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+plot(log10(dk9$baseMean),dk9$log2FoldChange,cex=0.5,pch=19,col="darkgray",btn="n",
   xlab="log10 basemean",ylab="log2 fold change",main="H3K9ac")
 points(log10(sig9$baseMean),sig9$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
 dev.off()
+
+subset(dk9,log10(baseMean)>3)[,c(1,2,5,6)]|>
+  kbl(caption = "TSS with high basemeans") |>
+  kable_paper("hover", full_width = F)
 
 ```
 
@@ -424,12 +464,24 @@ zz <- cbind(as.data.frame(z),assay(vsd))
 dk36 <- as.data.frame(zz[order(zz$pvalue),])
 write.table(dk36,file="k36a_deseq.tsv",quote=F,sep="\t")
 
-head(dk36) |>
-  kbl(caption = "Top significant genes in paired analysis for H3K36ac)") |>
+head(subset(dk36,log2FoldChange > 0),20)[,c(1,2,6)] |>
+  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
+  kable_paper("hover", full_width = F)
+
+head(subset(dk36,log2FoldChange < 0),20)[,c(1,2,6)] |>
+  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
   kable_paper("hover", full_width = F)
 
 nrow(subset(dk36,padj<0.05 & log2FoldChange > 0))
 nrow(subset(dk36,padj<0.05 & log2FoldChange < 0))
+
+dk36[grep("SLC2A4",rownames(dk9)),c(1,2,5,6)] |>
+  kbl(caption = "GLUT4 TSS H3K36ac)") |>
+  kable_paper("hover", full_width = F)
+
+dk36[grep("SLC2A",rownames(dk9)),c(1,2,5,6)] |>
+  kbl(caption = "GLUT transporters TSS H3K36ac)") |>
+  kable_paper("hover", full_width = F)
 
 ```
 
@@ -454,6 +506,10 @@ plot(log10(dk36$baseMean),dk36$log2FoldChange,cex=0.5,pch=19,col="darkgray",
 points(log10(sig36$baseMean),sig36$log2FoldChange,cex=0.5,pch=19,col="black")
 mtext(HEADER)
 dev.off()
+
+subset(dk36,log10(baseMean)>3)[,c(1,2,5,6)]  |>
+  kbl(caption = "TSS with high basemeans") |>
+  kable_paper("hover", full_width = F)
 
 ```
 
@@ -539,6 +595,7 @@ top <- rbind(up,dn)
 vec=top$s.dist
 names(vec)=top$set
 names(vec) <- gsub("_"," ",names(vec))
+names(vec) <- stringr::str_trunc(names(vec), 70)
 vec <- vec[order(vec)]
 barplot(abs(vec),col=sign(-vec)+3,horiz=TRUE,las=1,cex.names=0.65,main="H3K36ac",xlab="ES")
 grid()
@@ -568,14 +625,17 @@ rpm9_SLC2A4 <- matrix(rpm9_SLC2A4,nrow=2)
 colnames(rpm9_SLC2A4) <- 1:6
 rownames(rpm9_SLC2A4) <- c("Post","Pre")
 rpm9_SLC2A4 <- rpm9_SLC2A4[c(2,1),]
-barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K9ac",ylab="counts per million",xlab="participant",ylim=c(0,73))
+barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),
+  main="SLC2A4 H3K9ac",ylab="Counts per million",
+  xlab="Participant",ylim=c(0,73))
 legend(11.5,73, legend=c("Pre", "Post"), fill=c("#0047AB", "#D2042D"), cex=1)
 
 pdf("k9a_SLC2A4.pdf",width=5,height=5)
-barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K9ac",ylab="counts per million",xlab="participant",ylim=c(0,73))
+barplot(rpm9_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),
+  main="SLC2A4 H3K9ac",ylab="Counts per million",
+  xlab="Participant",ylim=c(0,73))
 legend(11.5,73, legend=c("Pre", "Post"), fill=c("#0047AB", "#D2042D"), cex=1)
 dev.off()
-
 
 rpm36_SLC2A4 <- rpm36[grep("SLC2A4",rownames(rpm36)),]
 rpm36_SLC2A4
@@ -584,11 +644,15 @@ rpm36_SLC2A4 <- matrix(rpm36_SLC2A4,nrow=2)
 colnames(rpm36_SLC2A4) <- 1:6
 rownames(rpm36_SLC2A4) <- c("Post","Pre")
 rpm36_SLC2A4 <- rpm36_SLC2A4[c(2,1),]
-barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K36ac",ylab="counts per million",xlab="participant",ylim=c(0,70))
+barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),
+  main="SLC2A4 H3K36ac",ylab="counts per million",
+  xlab="participant",ylim=c(0,70))
 legend(3.5,70, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
 
 pdf("k36a_SLC2A4.pdf",width=5,height=5)
-barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),main="SLC2A4 H3K36ac",ylab="counts per million",xlab="participant",ylim=c(0,70))
+barplot(rpm36_SLC2A4,beside=TRUE,col=c("#0047AB", "#D2042D"),
+  main="SLC2A4 H3K36ac",ylab="counts per million",
+  xlab="participant",ylim=c(0,70))
 legend(3.5,70, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
 dev.off()
 
