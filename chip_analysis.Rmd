@@ -400,11 +400,11 @@ dk9 <- as.data.frame(zz[order(zz$pvalue),])
 write.table(dk9,file="k9a_deseq.tsv",quote=F,sep="\t")
 
 head(subset(dk9,log2FoldChange > 0),20)[,c(1,2,6)] |>
-  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
+  kbl(caption = "Top increased genes in paired analysis for H3K9ac") |>
   kable_paper("hover", full_width = F)
 
 head(subset(dk9,log2FoldChange < 0),20)[,c(1,2,6)] |>
-  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
+  kbl(caption = "Top increased genes in paired analysis for H3K9ac") |>
   kable_paper("hover", full_width = F)
 
 nrow(subset(dk9,padj<0.05 & log2FoldChange > 0))
@@ -465,21 +465,21 @@ dk36 <- as.data.frame(zz[order(zz$pvalue),])
 write.table(dk36,file="k36a_deseq.tsv",quote=F,sep="\t")
 
 head(subset(dk36,log2FoldChange > 0),20)[,c(1,2,6)] |>
-  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
+  kbl(caption = "Top increased genes in paired analysis for H3K36ac") |>
   kable_paper("hover", full_width = F)
 
 head(subset(dk36,log2FoldChange < 0),20)[,c(1,2,6)] |>
-  kbl(caption = "Top increased genes in paired analysis for H3K9ac)") |>
+  kbl(caption = "Top increased genes in paired analysis for H3K36ac") |>
   kable_paper("hover", full_width = F)
 
 nrow(subset(dk36,padj<0.05 & log2FoldChange > 0))
 nrow(subset(dk36,padj<0.05 & log2FoldChange < 0))
 
-dk36[grep("SLC2A4",rownames(dk9)),c(1,2,5,6)] |>
+dk36[grep("SLC2A4",rownames(dk36)),c(1,2,5,6)] |>
   kbl(caption = "GLUT4 TSS H3K36ac)") |>
   kable_paper("hover", full_width = F)
 
-dk36[grep("SLC2A",rownames(dk9)),c(1,2,5,6)] |>
+dk36[grep("SLC2A",rownames(dk36)),c(1,2,5,6)] |>
   kbl(caption = "GLUT transporters TSS H3K36ac)") |>
   kable_paper("hover", full_width = F)
 
