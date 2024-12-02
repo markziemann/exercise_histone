@@ -37,8 +37,6 @@ gunzip -k GRCh38.primary_assembly.genome.fa.gz
 samtools faidx GRCh38.primary_assembly.genome.fa && rm  GRCh38.primary_assembly.genome.fa
 cut -f-2 GRCh38.primary_assembly.genome.fa.fai > GRCh38.primary_assembly.genome.fa.g
 
-
-
 awk '{OFS="\t"}{print $1,$2,$2,$3}' tss.tsv \
 | bedtools slop -b 2000  -g GRCh38.primary_assembly.genome.fa.g \
 | bedtools sort > tss.bed
