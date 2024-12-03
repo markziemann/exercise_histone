@@ -1,0 +1,89 @@
+---
+title: "Exercise integrative analysis of ChIP-seq and RNA-seq"
+author: "Mark Ziemann"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    fig_width: 5
+    fig_height: 5
+theme: cosmo
+---
+
+## Introduction
+
+```{r,packages}
+
+suppressPackageStartupMessages({
+    library("RhpcBLASctl")
+    library("gplots")
+    library("mitch")
+    library("eulerr")
+    library("limma")
+    library("beeswarm")
+    library("kableExtra")
+})
+
+RhpcBLASctl::blas_set_num_threads(1)
+
+```
+
+## Import data
+
+Firstly for H3K9ac.
+
+```{r,readpos1}
+
+tf <- gmt_import("ref/c3.tft.v2024.1.Hs.symbols.gmt")
+names(tf) <- gsub("_"," ",names(tf))
+
+go <- gmt_import("ref/c5.go.v2024.1.Hs.symbols.gmt")
+names(go) <- gsub("_"," ",names(go))
+
+gt <- read.table("gt.tsv")
+
+rna <- read.table("rna_deseq.tsv",sep="\t")
+rna$gene <- rownames(rna)
+
+k9a <- read.table("k9a_deseq.tsv",sep="\t")
+k9a$gene <- paste(sapply(strsplit(rownames(k9a)," "),"[[",1),sapply(strsplit(rownames(k9a)," "),"[[",2))
+
+k36a <- read.table("k36a_deseq.tsv",sep="\t")
+k36a$gene <- paste(sapply(strsplit(rownames(k36a)," "),"[[",1),sapply(strsplit(rownames(k36a)," "),"[[",2))
+
+l <- list("RNA"=rna,"H3K9ac"=k9a,"H3K36a"=k36a)
+
+m <- mitch_import(x=l,DEtype="deseq2",geneTable=gt,geneIDcol="gene")
+
+head(m)
+
+```
+
+## Analyse data
+
+GO
+
+```{r,go1}
+
+mgo <- mitch_calc(m,go,minsetsize=5,cores=8,priority="effect")
+mitch_report(mgo,"multi_go_report.html",overwrite=TRUE)
+
+```
+
+TF
+
+```{r,tf1}
+
+mtf <- mitch_calc(m,tf,minsetsize=50,cores=8,priority="effect")
+mitch_report(mtf,"multi_tf_report.html",overwrite=TRUE)
+
+```
+
+## Session information
+
+```{r,session}
+
+sessionInfo()
+
+```
