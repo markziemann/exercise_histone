@@ -13,8 +13,6 @@ theme: cosmo
 
 ## Introduction
 
-
-
 ```{r,packages}
 
 suppressPackageStartupMessages({
@@ -28,9 +26,177 @@ suppressPackageStartupMessages({
     library("topconfects")
     library("beeswarm")
     library("kableExtra")
+
+    library("dplyr")
+    library("network")
 })
 
 RhpcBLASctl::blas_set_num_threads(1)
+
+```
+
+Functions for network chart.
+
+
+```{r,networkfunc}
+
+map2color <- function(x,pal,limits=NULL){
+  if (is.null(limits)) limits <- range(x)
+  pal[findInterval(x,seq(limits[1],limits[2],length.out=length(pal)+1), all.inside=TRUE)]
+}
+
+gs2net <- function(gset,em,colfunc=colorRampPalette(c("blue", "white","red"))(n=100)){
+  gset <- gset[order(names(gset))]
+  mydf <- dplyr::bind_rows(lapply(gset, as.data.frame.list))
+  rownames(mydf) <- names(gset)
+  j <- apply(mydf,1,function(x) {
+    apply(mydf,1,function(y) {
+      length(intersect(x,y) ) / length(union(x,y))
+    })
+  })
+  j[lower.tri(j)] <- NA
+  j[lower.tri(j,diag=TRUE)] <- 0
+  jl <- reshape2::melt(j)
+  jl <- jl[which(jl$Var1 != jl$Var2),]
+  jl <- jl[which(jl$value != 1),]
+  jl <- jl[order(-jl$value),]
+  jl <- head(jl,length(gset)*2)
+  jl$edgeSize = jl$value/sum(jl$value)
+  nodes <- sort(union(jl[,1],jl[,2]))
+  lengths <- unlist(lapply(gset,length))
+  lengths <- lengths[names(lengths) %in% nodes]
+  nodes <- data.frame("nodes"=nodes,"lengths"=lengths)
+  nodes$vertexsize <- sqrt(nodes$lengths/sum(nodes$lengths) * 100)
+  nodes$es <- em[match(nodes$nodes,em$set),"s.dist"]
+  nodes$colours <- map2color(nodes$es,colfunc)
+  jl2 <- apply(jl[,1:2],2,as.character)
+  jlnet <- network(jl2)
+  jlnet$val <- lapply(jlnet$val, function(x) {
+    vn <- x[[2]]
+    vn <- substr(vn, 1, 60)
+    if (nchar(vn) == 60 ) {
+      vn <- paste(vn,"...",sep="")
+    }
+  x[[2]] <- vn
+  return(x)
+  } )
+  plot(jlnet, displaylabels = TRUE, label.col = "steelblue",
+       edge.lwd = c(jl$edgeSize) * 100,
+       arrowhead.cex = 0,
+       label.cex = 0.8, vertex.border = "white",vertex.cex = nodes$vertexsize,
+       vertex.col = nodes$colours, edge.col = "black")
+  E1 <- min(nodes$es)
+  E5 <- max(nodes$es)
+  E3 <- mean(c(E1,E5))
+  EE <- c(E1,E3,E5)
+  legcols <- map2color(EE,colfunc)
+  legend("topleft", legend=signif(EE,2) ,title="ES",box.lty=0,
+    fill=legcols, cex=0.8)
+  S1 <- min(nodes$vertexsize)
+  FRAG <- S1/10
+  S5 <- max(nodes$vertexsize)
+  S3 <- mean(c(S1,S5))
+  SS <- c(S1-FRAG,0,S5-FRAG)
+  L1 <- min(nodes$lengths)
+  L5 <- max(nodes$lengths)
+  LL <- paste(" ",c(L1,"",L5))
+  legend("topright", legend=LL ,title="no. genes",box.lty=0,
+    pt.cex=SS*1, cex=0.9 , pch=19,col="darkgray")
+  J1 <- min(jl$edgeSize)
+  FRAG <- J1*3
+  J5 <- max(jl$edgeSize)
+  J3 <- mean(c(J1,J5))
+  JJ <- c(J1,J3,J5)
+  JL <- JJ+FRAG
+  legend("bottomleft", legend=signif(JJ,2) , lwd=JL*50, title="Jaccard",
+    box.lty=0, cex=0.9 , lty=1, col="black")
+}
+
+networkplot <- function(eres,FDR=0.05,n_sets=20) {
+  scores <- eres[[1]][,1]
+  names(scores) <- rownames(eres[[1]])
+  gs <- eres[[2]]
+  eres <- eres[[4]]
+  up <- head(eres[eres$p.adjustANOVA < FDR & eres$s.dist > 0,],n_sets)
+  n_up <- nrow(up)
+  if (n_up >= 5) {
+    up_gs <- up[,1]
+    up_gs <- gs[which(names(gs) %in% up_gs)]
+    topgs_up <- lapply(seq(from=1,to=length(up_gs)),function(i) {
+      gsname <- names(up_gs)[i]
+      genes <- up_gs[[i]]
+      gene_scores <- scores[which(names(scores) %in% genes)]
+      top_genes <- names(which(gene_scores > quantile(gene_scores,c(2/3))))
+      return(top_genes)
+    })
+    names(topgs_up) <- names(up_gs)
+    gs2net(gset=topgs_up,em=eres,colfunc=colorRampPalette(c("pink","darkred"))(n=100))
+  } else {
+    message("Can't plot upregulated sets. Fewer than 5 found.")
+  }
+
+  dn <- head(eres[eres$p.adjustANOVA < FDR & eres$s.dist < 0,],n_sets)
+  n_dn <- nrow(dn)
+  if (n_dn >= 5) {
+    dn_gs <- dn[,1]
+    dn_gs <- gs[which(names(gs) %in% dn_gs)]
+    topgs_dn <- lapply(seq(from=1,to=length(dn_gs)),function(i) {
+      gsname <- names(dn_gs)[i]
+      genes <- dn_gs[[i]]
+      gene_scores <- scores[which(names(scores) %in% genes)]
+      top_genes <- names(which(gene_scores < quantile(gene_scores,c(1/3))))
+      return(top_genes)
+    })
+    names(topgs_dn) <- names(dn_gs)
+    gs2net(gset=topgs_dn,em=eres,colfunc=colorRampPalette(c("darkblue","lightblue"))(n=100))
+  } else {
+    message("Can't plot downregulated sets. Fewer than 5 found.")
+  }
+}
+
+network_genes <- function(eres,FDR=0.05,n_sets=20) {
+  scores <- eres[[1]][,1]
+  names(scores) <- rownames(eres[[1]])
+  gs <- eres[[2]]
+  eres <- eres[[4]]
+
+  up <- head(eres[eres$p.adjustANOVA < FDR & eres$s.dist > 0,],n_sets)
+  n_up <- nrow(up)
+  if (n_up > 0) {
+    up_gs <- up[,1]
+    up_gs <- gs[which(names(gs) %in% up_gs)]
+    topgs_up <- lapply(seq(from=1,to=length(up_gs)),function(i) {
+      gsname <- names(up_gs)[i]
+      genes <- up_gs[[i]]
+      gene_scores <- scores[which(names(scores) %in% genes)]
+      top_genes <- names(which(gene_scores>2))
+      return(top_genes)
+    })
+    names(topgs_up) <- names(up_gs)
+  } else {
+    topgs_up <- NULL
+    message("No significant upregulated sets to show.")
+  }
+
+  dn <- head(eres[eres$p.adjustANOVA < FDR & eres$s.dist < 0,],n_sets)
+  n_dn <- nrow(dn)
+  if (n_dn > 0) {
+    dn_gs <- dn[,1]
+    dn_gs <- gs[which(names(gs) %in% dn_gs)]
+    topgs_dn <- lapply(seq(from=1,to=length(dn_gs)),function(i) {
+      gsname <- names(dn_gs)[i]
+      genes <- dn_gs[[i]]
+      gene_scores <- scores[which(names(scores) %in% genes)]
+      top_genes <- names(which(gene_scores<2))
+      return(top_genes)
+    })
+    names(topgs_dn) <- names(dn_gs)
+  } else {
+    topgs_dn <- NULL
+    message("No significant upregulated sets to show.")
+  }
+  return(list(c("UP genesets"=topgs_up,"DOWN genesets"=topgs_dn)))
+}
 
 ```
 
@@ -209,6 +375,18 @@ if (! file.exists("rna_mitch.html") ) {
 
 ```
 
+Network chart and genes.
+
+```{r,netplot,fig.width=14,fig.height=6}
+
+par(mar=c(5.1, 4.1, 4.1, 2.1))
+
+networkplot(mres,FDR=0.05,n_sets=20)
+
+network_genes(mres,FDR=0.05,n_sets=20)
+
+```
+
 ## SLC
 
 ```{r,slc1,fig.height=5,fig.width=5}
@@ -239,6 +417,95 @@ SLC2A4
 
 ```
 
+## HATs and HDACs
+
+```{r,hats_hdac}
+
+hats <- c("ENSG00000010282.13 HAT1",
+  "ENSG00000122390.19 NAA60",
+  "ENSG00000108773.11 KAT2A",
+  "ENSG000001141663.8 KAT2B",
+  "ENSG00000172977.13 KAT5",
+  "ENSG00000083168.11 KAT6A",
+  "ENSG00000156650.14 KAT6B",
+  "ENSG00000136504.15 KAT7",
+  "ENSG00000103510.20 KAT8",
+  "ENSG00000100393.16 EP300",
+  "ENSG00000005339.15 CREBBP",
+  "ENSG00000147133.18 TAF1",
+  "ENSG00000125484.12 GTF3C4",
+  "ENSG00000084676.16 NCOA1",
+  "ENSG00000124151.19 NCOA3",
+  "ENSG00000140396.13 NCOA2",
+  "ENSG00000134852.15 CLOCK")
+
+hdacs <- c("ENSG00000116478.12 HDAC1",
+  "ENSG00000196591.12 HDAC2",
+  "ENSG00000171720.10 HDAC3",
+  "ENSG00000068024.18 HDAC4",
+  "ENSG00000108840.17 HDAC5",
+  "ENSG00000094631.22 HDAC6",
+  "ENSG00000061273.18 HDAC7",
+  "ENSG00000147099.21 HDAC8",
+  "ENSG00000048052.25 HDAC9",
+  "ENSG00000100429.18 HDAC10",
+  "ENSG00000163517.15 HDAC11",
+  "ENSG00000096717.12 SIRT1",
+  "ENSG00000068903.21 SIRT2",
+  "ENSG00000142082.15 SIRT3",
+  "ENSG00000089163.4 SIRT4",
+  "ENSG00000124523.17 SIRT5",
+  "ENSG00000077463.15 SIRT6",
+  "ENSG00000187531.14 SIRT7")
+
+y1 <- rpm[which(rownames(rpm) %in% hats),,drop=FALSE]
+
+gbarplot <- function(i,y) {
+  y <- y[i,,drop=FALSE]
+  gname=rownames(y)[1]
+  yy <- matrix(y[1,],nrow=2)
+  colnames(yy) <- 1:6
+  rownames(yy) <- c("Post","Pre")
+  yy <- yy[c(2,1),]
+
+  barplot(yy,beside=TRUE,col=c("#0047AB", "#D2042D"),
+    main=gname,ylab="counts per million",xlab="participant")
+  legend(11,300, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+
+  legend(11,300, legend=c("Pre", "Post"), fill=c("#0047AB","#D2042D"), cex=1)
+}
+
+lapply(1:nrow(y1), gbarplot, y1)
+
+dge1 <- dge[which(rownames(dge) %in% hats),]
+
+head(dge1) |>
+  kbl(caption = "HAT genes)") |>
+  kable_paper("hover", full_width = F)
+
+HEADER=paste(NTOT,"genes detected;",NSIG,"@5%FDR;",NUP,"up",NDOWN,"down")
+
+plot(log10(dge$baseMean),dge$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+  xlab="log10 basemean",ylab="log2 fold change",main="RNA expression")
+points(log10(dge1$baseMean),dge1$log2FoldChange,cex=0.5,pch=19,col="black")
+mtext("HATs")
+
+y2 <- rpm[which(rownames(rpm) %in% hdacs),,drop=FALSE]
+
+lapply(1:nrow(y2), gbarplot, y2)
+
+dge2 <- dge[which(rownames(dge) %in% hdacs),]
+
+head(dge2) |>
+  kbl(caption = "HDAC genes)") |>
+  kable_paper("hover", full_width = F)
+
+plot(log10(dge$baseMean),dge$log2FoldChange,cex=0.5,pch=19,col="darkgray",
+  xlab="log10 basemean",ylab="log2 fold change",main="RNA expression")
+points(log10(dge2$baseMean),dge2$log2FoldChange,cex=0.5,pch=19,col="black")
+mtext("HDACs")
+
+```
 
 ## Session
 
